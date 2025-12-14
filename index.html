@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер Игра PRO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: all 0.5s ease;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .game-section {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        
+        .upgrades-section {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #a0a0c0;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 180px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: #a0a0c0;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .score-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px auto;
+            width: 90%;
+            border: 2px solid #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.2);
+        }
+        
+        .score-label {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #a0a0c0;
+        }
+        
+        .score {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+            transition: all 0.3s ease;
+        }
+        
+        .click-button {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ff9900, #ffcc00);
+            border: none;
+            color: #1a1a2e;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 30px auto;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 
+                        inset 0 -5px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 5px 15px rgba(255, 255, 255, 0.3);
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .click-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .click-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3), 
+                        inset 0 -5px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 5px 15px rgba(255, 255, 255, 0.3);
+        }
+        
+        .button-text {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .button-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .click-button:active .button-glow {
+            opacity: 1;
+        }
+        
+        .goal-info {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #a0a0c0;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        
+        .goal-number {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            width: 90%;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff9900, #ffcc00);
+            width: 0%;
+            border-radius: 12px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent);
+            animation: progressShine 2s infinite;
+        }
+        
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .click-effect {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 204, 0, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            animation: clickAnimation 0.8s forwards;
+        }
+        
+        @keyframes clickAnimation {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+        
+        .upgrades-title {
+            font-size: 2rem;
+            color: #ffcc00;
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 204, 0, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .upgrades-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .upgrade-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 204, 0, 0.2);
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .upgrade-item:hover {
+            background: rgba(255, 204, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .upgrade-item.unlocked {
+            border-color: #00cc00;
+            background: rgba(0, 255, 0, 0.05);
+        }
+        
+        .upgrade-item.locked {
+            opacity: 0.6;
+        }
+        
+        .upgrade-info {
+            flex: 1;
+        }
+        
+        .upgrade-name {
+            font-size: 1.3rem;
+            color: #ffcc00;
+            margin-bottom: 5px;
+        }
+        
+        .upgrade-description {
+            font-size: 0.9rem;
+            color: #a0a0c0;
+            margin-bottom: 8px;
+        }
+        
+        .upgrade-level {
+            font-size: 0.9rem;
+            color: #00ccff;
+        }
+        
+        .upgrade-cost {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff9900;
+            min-width: 120px;
+            text-align: right;
+        }
+        
+        .upgrade-button {
+            background: linear-gradient(145deg, #ff9900, #ffcc00);
+            border: none;
+            color: #1a1a2e;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+        
+        .upgrade-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        .upgrade-button:disabled {
+            background: #666;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .auto-clicker-notice {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #00ccff;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .victory-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(15,15,35,0.98) 0%, rgba(26,26,46,0.98) 100%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            animation: victoryFadeIn 1s ease;
+        }
+        
+        @keyframes victoryFadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        .victory-content {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255, 204, 0, 0.5);
+            max-width: 700px;
+            width: 90%;
+            border: 3px solid #ffcc00;
+            animation: victoryPulse 2s infinite;
+        }
+        
+        @keyframes victoryPulse {
+            0% {
+                box-shadow: 0 0 50px rgba(255, 204, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 80px rgba(255, 204, 0, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 50px rgba(255, 204, 0, 0.5);
+            }
+        }
+        
+        .victory-title {
+            font-size: 4rem;
+            color: #ffcc00;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.8);
+        }
+        
+        .victory-text {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        
+        .final-score {
+            font-size: 2.5rem;
+            color: #ffcc00;
+            margin: 20px 0;
+        }
+        
+        .final-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .final-stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 180px;
+        }
+        
+        .final-stat-value {
+            font-size: 2rem;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .restart-button {
+            background: linear-gradient(145deg, #ff9900, #ffcc00);
+            border: none;
+            color: #1a1a2e;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 15px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .restart-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            font-size: 1rem;
+            color: #a0a0c0;
+            line-height: 1.5;
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .click-button {
+                width: 180px;
+                height: 180px;
+                font-size: 1.6rem;
+            }
+            
+            .score {
+                font-size: 3rem;
+            }
+            
+            .victory-title {
+                font-size: 2.8rem;
+            }
+            
+            .upgrade-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .upgrade-cost {
+                text-align: left;
+                width: 100%;
+            }
+            
+            .upgrade-button {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>КЛИКЕР ИГРА PRO</h1>
+    <p class="subtitle">Кликай на кнопку, покупай улучшения и набери 1,000,000 очков!</p>
+    
+    <div class="stats-container">
+        <div class="stat-box">
+            <div class="stat-label">Очков за клик:</div>
+            <div class="stat-value" id="pointsPerClick">1</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Автокликов в сек:</div>
+            <div class="stat-value" id="autoClickRate">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Всего улучшений:</div>
+            <div class="stat-value" id="totalUpgrades">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Всего кликов:</div>
+            <div class="stat-value" id="clickCount">0</div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="game-section">
+            <div class="score-container">
+                <div class="score-label">Ваши очки:</div>
+                <div class="score" id="score">0</div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            
+            <div class="goal-info">Цель: набрать <span class="goal-number">1,000,000</span> очков</div>
+            
+            <button class="click-button" id="clickButton">
+                <span class="button-text">КЛИКАЙ!</span>
+                <div class="button-glow"></div>
+            </button>
+            
+            <div class="auto-clicker-notice" id="autoClickerNotice"></div>
+        </div>
+        
+        <div class="upgrades-section">
+            <h2 class="upgrades-title">УЛУЧШЕНИЯ</h2>
+            <div class="upgrades-list" id="upgradesList">
+                <!-- Улучшения будут добавляться с помощью JS -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <strong>Как играть:</strong> Кликайте на кнопку для получения очков. Набирайте очки и покупайте улучшения, которые увеличивают количество очков за клик или добавляют автоклики. Цель игры - набрать 1,000,000 очков.
+    </div>
+    
+    <div class="victory-screen" id="victoryScreen">
+        <div class="victory-content">
+            <h2 class="victory-title">ПОБЕДА!</h2>
+            <p class="victory-text">Невероятно! Вы набрали 1,000,000 очков и стали мастером кликера!</p>
+            
+            <div class="final-score">Ваш итоговый счет: <span id="finalScore">0</span></div>
+            
+            <div class="final-stats">
+                <div class="final-stat">
+                    <div>Всего кликов:</div>
+                    <div class="final-stat-value" id="finalClicks">0</div>
+                </div>
+                <div class="final-stat">
+                    <div>Куплено улучшений:</div>
+                    <div class="final-stat-value" id="finalUpgrades">0</div>
+                </div>
+                <div class="final-stat">
+                    <div>Очков за клик:</div>
+                    <div class="final-stat-value" id="finalPPC">1</div>
+                </div>
+            </div>
+            
+            <p class="victory-text">Игра закроется автоматически через 7 секунд...</p>
+            <button class="restart-button" id="restartButton">Играть снова</button>
+        </div>
+    </div>
+
+    <script>
+        // Игровые переменные
+        let score = 0;
+        let clickCount = 0;
+        let pointsPerClick = 1;
+        let autoClickRate = 0;
+        let autoClickerActive = false;
+        let totalUpgrades = 0;
+        const goal = 1000000; // 1,000,000 очков
+        let gameActive = true;
+        
+        // Система улучшений
+        const upgrades = [
+            {
+                id: 1,
+                name: "Усиленный клик",
+                description: "Увеличивает очки за клик на 1",
+                baseCost: 50,
+                cost: 50,
+                level: 0,
+                maxLevel: 20,
+                effect: () => { pointsPerClick += 1; },
+                type: "click"
+            },
+            {
+                id: 2,
+                name: "Супер клик",
+                description: "Увеличивает очки за клик на 5",
+                baseCost: 500,
+                cost: 500,
+                level: 0,
+                maxLevel: 10,
+                effect: () => { pointsPerClick += 5; },
+                type: "click"
+            },
+            {
+                id: 3,
+                name: "Автокликер I",
+                description: "Добавляет 1 автоклик в секунду",
+                baseCost: 1000,
+                cost: 1000,
+                level: 0,
+                maxLevel: 5,
+                effect: () => { autoClickRate += 1; },
+                type: "auto"
+            },
+            {
+                id: 4,
+                name: "Автокликер II",
+                description: "Добавляет 5 автокликов в секунду",
+                baseCost: 5000,
+                cost: 5000,
+                level: 0,
+                maxLevel: 3,
+                effect: () => { autoClickRate += 5; },
+                type: "auto"
+            },
+            {
+                id: 5,
+                name: "Множитель x2",
+                description: "Удваивает очки за клик",
+                baseCost: 10000,
+                cost: 10000,
+                level: 0,
+                maxLevel: 1,
+                effect: () => { pointsPerClick *= 2; },
+                type: "multiplier"
+            },
+            {
+                id: 6,
+                name: "Клик-бустер",
+                description: "Увеличивает очки за клик на 10",
+                baseCost: 20000,
+                cost: 20000,
+                level: 0,
+                maxLevel: 5,
+                effect: () => { pointsPerClick += 10; },
+                type: "click"
+            },
+            {
+                id: 7,
+                name: "Мега-автокликер",
+                description: "Добавляет 10 автокликов в секунду",
+                baseCost: 50000,
+                cost: 50000,
+                level: 0,
+                maxLevel: 3,
+                effect: () => { autoClickRate += 10; },
+                type: "auto"
+            },
+            {
+                id: 8,
+                name: "Множитель x3",
+                description: "Утраивает очки за клик",
+                baseCost: 100000,
+                cost: 100000,
+                level: 0,
+                maxLevel: 1,
+                effect: () => { pointsPerClick *= 3; },
+                type: "multiplier"
+            }
+        ];
+        
+        // Элементы DOM
+        const scoreElement = document.getElementById('score');
+        const clickButton = document.getElementById('clickButton');
+        const victoryScreen = document.getElementById('victoryScreen');
+        const progressFill = document.getElementById('progress');
+        const clickCountElement = document.getElementById('clickCount');
+        const pointsPerClickElement = document.getElementById('pointsPerClick');
+        const autoClickRateElement = document.getElementById('autoClickRate');
+        const totalUpgradesElement = document.getElementById('totalUpgrades');
+        const finalScoreElement = document.getElementById('finalScore');
+        const finalClicksElement = document.getElementById('finalClicks');
+        const finalUpgradesElement = document.getElementById('finalUpgrades');
+        const finalPPCElement = document.getElementById('finalPPC');
+        const restartButton = document.getElementById('restartButton');
+        const upgradesList = document.getElementById('upgradesList');
+        const autoClickerNotice = document.getElementById('autoClickerNotice');
+        
+        // Инициализация улучшений
+        function initializeUpgrades() {
+            upgradesList.innerHTML = '';
+            
+            upgrades.forEach(upgrade => {
+                const upgradeElement = document.createElement('div');
+                upgradeElement.className = 'upgrade-item';
+                upgradeElement.id = `upgrade-${upgrade.id}`;
+                
+                const isMaxLevel = upgrade.level >= upgrade.maxLevel;
+                const canAfford = score >= upgrade.cost;
+                
+                upgradeElement.innerHTML = `
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">${upgrade.name}</div>
+                        <div class="upgrade-description">${upgrade.description}</div>
+                        <div class="upgrade-level">Уровень: ${upgrade.level}/${upgrade.maxLevel}</div>
+                    </div>
+                    <div class="upgrade-cost">${formatNumber(upgrade.cost)} очков</div>
+                    <button class="upgrade-button" ${isMaxLevel || !canAfford ? 'disabled' : ''}>
+                        ${isMaxLevel ? 'MAX' : 'Купить'}
+                    </button>
+                `;
+                
+                // Обработчик покупки улучшения
+                const buyButton = upgradeElement.querySelector('.upgrade-button');
+                if (!isMaxLevel) {
+                    buyButton.addEventListener('click', () => buyUpgrade(upgrade.id));
+                }
+                
+                upgradesList.appendChild(upgradeElement);
+                updateUpgradeDisplay(upgrade.id);
+            });
+        }
+        
+        // Покупка улучшения
+        function buyUpgrade(upgradeId) {
+            const upgrade = upgrades.find(u => u.id === upgradeId);
+            
+            if (!upgrade || upgrade.level >= upgrade.maxLevel || score < upgrade.cost) {
+                return;
+            }
+            
+            // Списание очков
+            score -= upgrade.cost;
+            
+            // Применение эффекта улучшения
+            upgrade.effect();
+            
+            // Увеличение уровня улучшения
+            upgrade.level++;
+            totalUpgrades++;
+            
+            // Увеличение стоимости для следующего уровня
+            if (upgrade.level < upgrade.maxLevel) {
+                upgrade.cost = Math.floor(upgrade.baseCost * Math.pow(1.5, upgrade.level));
+            }
+            
+            // Обновление интерфейса
+            updateScore();
+            updateStats();
+            updateUpgradeDisplay(upgradeId);
+            
+            // Запуск автокликера при первом покупке автокликера
+            if (upgrade.type === 'auto' && !autoClickerActive && autoClickRate > 0) {
+                startAutoClicker();
+            }
+            
+            // Визуальная обратная связь
+            const upgradeElement = document.getElementById(`upgrade-${upgradeId}`);
+            upgradeElement.classList.add('unlocked');
+            setTimeout(() => {
+                upgradeElement.classList.remove('unlocked');
+            }, 500);
+        }
+        
+        // Обновление отображения улучшения
+        function updateUpgradeDisplay(upgradeId) {
+            const upgrade = upgrades.find(u => u.id === upgradeId);
+            const upgradeElement = document.getElementById(`upgrade-${upgradeId}`);
+            
+            if (!upgradeElement) return;
+            
+            const isMaxLevel = upgrade.level >= upgrade.maxLevel;
+            const canAfford = score >= upgrade.cost;
+            
+            // Обновление информации
+            const levelElement = upgradeElement.querySelector('.upgrade-level');
+            const costElement = upgradeElement.querySelector('.upgrade-cost');
+            const buttonElement = upgradeElement.querySelector('.upgrade-button');
+            
+            levelElement.textContent = `Уровень: ${upgrade.level}/${upgrade.maxLevel}`;
+            costElement.textContent = `${formatNumber(upgrade.cost)} очков`;
+            
+            // Обновление состояния кнопки
+            if (isMaxLevel) {
+                buttonElement.textContent = 'MAX';
+                buttonElement.disabled = true;
+                upgradeElement.classList.add('locked');
+            } else {
+                buttonElement.textContent = 'Купить';
+                buttonElement.disabled = !canAfford;
+                upgradeElement.classList.remove('locked');
+            }
+            
+            // Визуальное выделение доступных улучшений
+            if (canAfford && !isMaxLevel) {
+                upgradeElement.style.borderColor = '#ffcc00';
+                upgradeElement.style.boxShadow = '0 0 10px rgba(255, 204, 0, 0.3)';
+            } else {
+                upgradeElement.style.borderColor = '';
+                upgradeElement.style.boxShadow = '';
+            }
+        }
+        
+        // Запуск автокликера
+        function startAutoClicker() {
+            if (autoClickerActive) return;
+            
+            autoClickerActive = true;
+            autoClickerNotice.textContent = `Автокликер активен! +${autoClickRate} очков/сек`;
+            autoClickerNotice.style.display = 'block';
+            
+            // Автоматическое добавление очков
+            const autoClickInterval = setInterval(() => {
+                if (!gameActive) {
+                    clearInterval(autoClickInterval);
+                    return;
+                }
+                
+                if (autoClickRate > 0) {
+                    score += autoClickRate;
+                    updateScore();
+                    
+                    // Периодическое обновление улучшений
+                    if (Math.random() > 0.7) {
+                        upgrades.forEach(upgrade => {
+                            updateUpgradeDisplay(upgrade.id);
+                        });
+                    }
+                }
+            }, 1000);
+        }
+        
+        // Форматирование больших чисел
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(2) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+        
+        // Обновление отображения счета
+        function updateScore() {
+            scoreElement.textContent = formatNumber(score);
+            
+            // Обновление прогресс-бара
+            const progressPercent = Math.min((score / goal) * 100, 100);
+            progressFill.style.width = `${progressPercent}%`;
+            
+            // Анимация счета при изменении
+            scoreElement.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                scoreElement.style.transform = 'scale(1)';
+            }, 150);
+            
+            // Проверка на победу
+            if (score >= goal && gameActive) {
+                gameActive = false;
+                showVictoryScreen();
+            }
+            
+            // Обновление доступности улучшений
+            upgrades.forEach(upgrade => {
+                updateUpgradeDisplay(upgrade.id);
+            });
+        }
+        
+        // Обновление статистики
+        function updateStats() {
+            pointsPerClickElement.textContent = formatNumber(pointsPerClick);
+            autoClickRateElement.textContent = formatNumber(autoClickRate);
+            totalUpgradesElement.textContent = totalUpgrades;
+            clickCountElement.textContent = formatNumber(clickCount);
+        }
+        
+        // Создание эффекта клика
+        function createClickEffect(x, y) {
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.style.left = `${x}px`;
+            effect.style.top = `${y}px`;
+            document.body.appendChild(effect);
+            
+            // Удаление эффекта после анимации
+            setTimeout(() => {
+                effect.remove();
+            }, 800);
+        }
+        
+        // Обработчик клика по кнопке
+        clickButton.addEventListener('click', function(e) {
+            if (!gameActive) return;
+            
+            // Увеличение счета
+            score += pointsPerClick;
+            clickCount++;
+            
+            // Создание эффекта клика
+            const rect = this.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            createClickEffect(x + rect.left, y + rect.top);
+            
+            // Обновление интерфейса
+            updateScore();
+            updateStats();
+            
+            // Случайная анимация кнопки
+            if (Math.random() > 0.7) {
+                this.style.transform = `scale(${Math.random() * 0.1 + 0.9})`;
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 100);
+            }
+        });
+        
+        // Показать экран победы
+        function showVictoryScreen() {
+            finalScoreElement.textContent = formatNumber(score);
+            finalClicksElement.textContent = formatNumber(clickCount);
+            finalUpgradesElement.textContent = totalUpgrades;
+            finalPPCElement.textContent = formatNumber(pointsPerClick);
+            victoryScreen.style.display = 'flex';
+            
+            // Автоматическое закрытие игры через 7 секунд
+            setTimeout(() => {
+                document.body.innerHTML = `
+                    <div style="
+                        display: flex; 
+                        flex-direction: column; 
+                        align-items: center; 
+                        justify-content: center; 
+                        height: 100vh; 
+                        background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); 
+                        color: white; 
+                        text-align: center;
+                        padding: 20px;
+                    ">
+                        <h1 style="color: #ffcc00; margin-bottom: 20px; font-size: 3rem;">ВЫ ПОБЕДИЛИ!</h1>
+                        <p style="font-size: 1.5rem; max-width: 600px; margin-bottom: 30px;">
+                            Вы набрали 1,000,000 очков и стали легендой кликера!
+                        </p>
+                        <div style="font-size: 1.2rem; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+                            <div>Итоговый счет: <strong style="color: #ffcc00;">${formatNumber(score)}</strong></div>
+                            <div>Всего кликов: <strong style="color: #ffcc00;">${formatNumber(clickCount)}</strong></div>
+                            <div>Куплено улучшений: <strong style="color: #ffcc00;">${totalUpgrades}</strong></div>
+                        </div>
+                        <p style="margin-top: 30px; color: #a0a0c0; font-size: 1rem;">
+                            Игра "Кликер PRO" - пример игры с системой улучшений
+                        </p>
+                    </div>
+                `;
+            }, 7000);
+        }
+        
+        // Перезапуск игры
+        restartButton.addEventListener('click', function() {
+            // Сброс всех значений
+            score = 0;
+            clickCount = 0;
+            pointsPerClick = 1;
+            autoClickRate = 0;
+            autoClickerActive = false;
+            totalUpgrades = 0;
+            gameActive = true;
+            
+            // Сброс улучшений
+            upgrades.forEach(upgrade => {
+                upgrade.level = 0;
+                upgrade.cost = upgrade.baseCost;
+            });
+            
+            // Скрытие экрана победы
+            victoryScreen.style.display = 'none';
+            autoClickerNotice.style.display = 'none';
+            
+            // Обновление интерфейса
+            updateScore();
+            updateStats();
+            initializeUpgrades();
+        });
+        
+        // Инициализация игры
+        function initGame() {
+            updateScore();
+            updateStats();
+            initializeUpgrades();
+            
+            // Дополнительная возможность кликать пробелом
+            document.addEventListener('keydown', function(e) {
+                if (e.code === 'Space' && gameActive) {
+                    // Имитация клика по кнопке
+                    clickButton.click();
+                    
+                    // Добавляем визуальную обратную связь
+                    clickButton.style.backgroundColor = '#ff9900';
+                    setTimeout(() => {
+                        clickButton.style.backgroundColor = '';
+                    }, 100);
+                    
+                    // Предотвращаем прокрутку страницы
+                    e.preventDefault();
+                }
+            });
+            
+            // Информация для разработчика
+            console.log("Добро пожаловать в Кликер PRO!");
+            console.log("Цель: набрать 1,000,000 очков с помощью кликов и улучшений.");
+            console.log("Улучшения увеличивают очки за клик или добавляют автоклики.");
+        }
+        
+        // Запуск игры
+        initGame();
+    </script>
+</body>
+</html>
